@@ -1,10 +1,15 @@
+const path = require("path");
+
 const express = require("express");
 const readFile = require("read-excel-file/node");
 const multer = require("multer");
 const axios = require("axios").default;
+const dotenv = require("dotenv");
+
+dotenv.config({ path: "./.env" });
 
 const app = express();
-const port = 7000;
+const port = process.env.PORT;
 
 const fileFilter = (req, file, cb) => {
   if (
@@ -35,7 +40,7 @@ app.post("/api/deposit/upload", upload.single("file"), (req, res) => {
   }
 
   let path = "./resources/uploads/" + req.file.filename;
-  const betikaURL = "https://retries.dev01.int.betika.com/deposit";
+  const betikaURL = process.env.URL;
 
   let depositData = [];
 
