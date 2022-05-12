@@ -20,32 +20,28 @@ router.post("/api/deposit/upload", upload.single("file"), async (req, res) => {
   readFile(path, { sheet: "Deposit" }).then((rows) => {
     rows.shift();
 
-    let depositData = [];
-
     rows.forEach((row) => {
+      let time = new Date(row[1]);
+
+      let dayMonth = time.toLocaleString().split(",")[0];
+      let hourMin = time.toLocaleString().split(",")[1];
+
+      let formattedTime = dayMonth.split("/").join("-") + " " + hourMin.trim();
+
       let data = {
-        msisdn: row[0],
-        depositDate: row[1],
-        mpesaCode: row[2],
-        amount: row[3],
+        msisdn: row[0].toString(),
+        trx_time: formattedTime.toString(),
+        transaction_code: row[2].toString(),
+        amount: parseInt(row[3]),
       };
 
-      depositData.push(data);
-    });
-
-    let payload = { msisdn: "25412345678", transactionCode: "QWERTTYSDJ13" };
-
-    depositData.filter((data) => {
-      //making filtering failed deposit and making request to deposit app
       axios
-        .post(betikaURL, payload)
+        .post(betikaURL, JSON.stringify(data))
         .then((res) => {
-          if (res.status === 200 && data.msisdn === payload.msisdn) {
+          if (res.status == 200) {
             console.log({ status: res.statusText });
-          } else if (res.status === 200 && data.msisdn !== payload.msisdn) {
+          } else if (res.status == 421) {
             console.log({ status: res.statusText });
-          } else if (res.status === 421) {
-            console.log({ status: "failed" });
           }
         })
         .catch((error) => {
