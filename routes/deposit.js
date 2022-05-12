@@ -8,7 +8,7 @@ const router = express();
 
 dotenv.config({ path: "./.env" });
 
-router.post("/api/deposit/upload", upload.single("file"), async (req, res) => {
+router.post("/api/deposit/upload", upload.single("file"), (req, res) => {
   if (req.file == undefined) {
     return res.status(400).send({ msg: "Please upload a file" });
   }
@@ -28,7 +28,7 @@ router.post("/api/deposit/upload", upload.single("file"), async (req, res) => {
 
       let formattedTime = dayMonth.split("/").join("-") + " " + hourMin.trim();
 
-      let data = {
+      let payload = {
         msisdn: row[0].toString(),
         trx_time: formattedTime.toString(),
         transaction_code: row[2].toString(),
@@ -36,7 +36,7 @@ router.post("/api/deposit/upload", upload.single("file"), async (req, res) => {
       };
 
       axios
-        .post(betikaURL, JSON.stringify(data))
+        .post(betikaURL, JSON.stringify(payload))
         .then((res) => {
           if (res.status == 200) {
             console.log({ status: res.statusText });
@@ -50,7 +50,7 @@ router.post("/api/deposit/upload", upload.single("file"), async (req, res) => {
     });
   });
 
-  return res.status(200).send({ msg: "Success" });
+  return res.status(200).send({ msg: "Ok" });
 });
 
 module.exports = router;
