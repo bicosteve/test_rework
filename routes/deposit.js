@@ -1,5 +1,3 @@
-const path = require("path");
-
 const express = require("express");
 const readFile = require("read-excel-file/node");
 const axios = require("axios").default;
@@ -18,7 +16,7 @@ router.post("/api/deposit/upload", upload.single("file"), async (req, res) => {
   let path = "./resources/uploads/" + req.file.filename;
   const betikaURL = process.env.URL;
 
-  //converting xls file to readable format
+  //converting xls/csv file to readable array format
   readFile(path, { sheet: "Deposit" }).then((rows) => {
     rows.shift();
 
@@ -38,14 +36,15 @@ router.post("/api/deposit/upload", upload.single("file"), async (req, res) => {
     let payload = { msisdn: "25412345678", transactionCode: "QWERTTYSDJ13" };
 
     depositData.filter((data) => {
+      //making filtering failed deposit and making request to deposit app
       axios
         .post(betikaURL, payload)
         .then((res) => {
-          if (res.status === 200) {
-            console.log({ status: "Ok" });
-          } else if (res.status === 404) {
-            console.log({ status: "failed" });
-          } else {
+          if (res.status === 200 && data.msisdn === payload.msisdn) {
+            console.log({ status: res.statusText });
+          } else if (res.status === 200 && data.msisdn !== payload.msisdn) {
+            console.log({ status: res.statusText });
+          } else if (res.status === 421) {
             console.log({ status: "failed" });
           }
         })
