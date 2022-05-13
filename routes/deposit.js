@@ -9,7 +9,7 @@ const router = express();
 dotenv.config({ path: "./.env" });
 
 router.post("/api/deposit/upload", upload.single("file"), (req, res) => {
-  if (req.file == undefined) {
+  if (req.file === undefined) {
     return res.status(400).send({ msg: "Please upload a file" });
   }
 
@@ -38,9 +38,11 @@ router.post("/api/deposit/upload", upload.single("file"), (req, res) => {
       axios
         .post(betikaURL, JSON.stringify(payload))
         .then((res) => {
-          if (res.status == 200) {
+          if (res.status === 200) {
             console.log({ status: res.statusText });
-          } else if (res.status == 421) {
+          } else if (res.statusText !== "OK") {
+            console.log({ status: "failed" });
+          } else if (res.status === 421) {
             console.log({ status: res.statusText });
           }
         })
@@ -50,7 +52,7 @@ router.post("/api/deposit/upload", upload.single("file"), (req, res) => {
     });
   });
 
-  return res.status(200).send({ msg: "Ok" });
+  return res.status(200).json({ msg: "Ok" });
 });
 
 module.exports = router;
